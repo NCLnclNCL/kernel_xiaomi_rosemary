@@ -1,0 +1,13 @@
+ebc3ded2b22807e0c3662222636260820a1b76cf		branch 'next' of https://github.com/KernelSU-Next/KernelSU-Next
+7e348c6873bbec713b1bd8bc44e206852225fd2b	not-for-merge	branch 'dependabot/cargo/userspace/ksud_magic/crates-59878858ca' of https://github.com/KernelSU-Next/KernelSU-Next
+c21031a0269d2f17e57bd9972a1b1edaa0d6878b	not-for-merge	branch 'dependabot/cargo/userspace/ksud_overlayfs/crates-59878858ca' of https://github.com/KernelSU-Next/KernelSU-Next
+a1a026d21dbf4e2ff2e1d11ab06a6b74f2c51e8d	not-for-merge	branch 'dependabot/github_actions/actions-74022cbdc3' of https://github.com/KernelSU-Next/KernelSU-Next
+231e74d8c1546096056a1e280fc1edb9cde5f38e	not-for-merge	branch 'dependabot/gradle/manager/maven-9a92396f28' of https://github.com/KernelSU-Next/KernelSU-Next
+6f6b797e2214f2ff8f905df95bb27669e687e273	not-for-merge	branch 'magicoverlayfs' of https://github.com/KernelSU-Next/KernelSU-Next
+c6d8160611d5fa57425924ac956ba865252e4040	not-for-merge	branch 'next-susfs' of https://github.com/KernelSU-Next/KernelSU-Next
+5def2c535d21b038497fef019dd7b4f2d8791ae6	not-for-merge	branch 'next-susfs-dev' of https://github.com/KernelSU-Next/KernelSU-Next
+fad59b6e54ed65b1716c89bb6410d15ce28673e0	not-for-merge	branch 'next-ul' of https://github.com/KernelSU-Next/KernelSU-Next
+b82f50685d05d55f17a0b7beb4e2f5d36898d9d6	not-for-merge	branch 'patch-new-wx' of https://github.com/KernelSU-Next/KernelSU-Next
+cd0031e8a53d34b2f76917e9040203c4a758d05a	not-for-merge	branch 'staging' of https://github.com/KernelSU-Next/KernelSU-Next
+2b3686524b8fe4d915c5b15f26ccef8b2e3c01e1	not-for-merge	branch 'testing' of https://github.com/KernelSU-Next/KernelSU-Next
+0bb48d09aa17cf7d5ae19448054a78bf54b3d6d6	not-for-merge	branch 'x86' of https://github.com/KernelSU-Next/KernelSU-Next
