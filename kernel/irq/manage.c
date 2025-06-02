@@ -20,10 +20,10 @@
 #include <linux/sched/task.h>
 #include <uapi/linux/sched/types.h>
 #include <linux/task_work.h>
-#include <linux/cpu.h>
+//#include <linux/cpu.h>
 
 #include "internals.h"
-
+/*
 struct irq_desc_list {
 	struct list_head list;
 	struct irq_desc *desc;
@@ -33,8 +33,9 @@ struct irq_desc_list {
 static LIST_HEAD(perf_crit_irqs);
 static DEFINE_RAW_SPINLOCK(perf_irqs_lock);
 static int perf_cpu_index = -1;
+static int prime_cpu_index = -1;
 static bool perf_crit_suspended;
-
+*/
 #ifdef CONFIG_IRQ_FORCED_THREADING
 __read_mostly bool force_irqthreads;
 
@@ -159,8 +160,9 @@ bool irq_can_set_affinity_usr(unsigned int irq)
 	struct irq_desc *desc = irq_to_desc(irq);
 
 	return __irq_can_set_affinity(desc) &&
-		!irqd_affinity_is_managed(&desc->irq_data) &&
-		!irqd_has_set(&desc->irq_data, IRQD_PERF_CRITICAL);
+		!irqd_affinity_is_managed(&desc->irq_data);
+	//	!irqd_affinity_is_managed(&desc->irq_data) &&
+	//	!irqd_has_set(&desc->irq_data, IRQD_PERF_CRITICAL);
 }
 
 /**
@@ -1176,7 +1178,7 @@ setup_irq_thread(struct irqaction *new, unsigned int irq, bool secondary)
 	set_bit(IRQTF_AFFINITY, &new->thread_flags);
 	return 0;
 }
-
+/*
 static void add_desc_to_perf_list(struct irq_desc *desc, unsigned int perf_flag)
 {
 	struct irq_desc_list *item;
@@ -1199,7 +1201,8 @@ static void affine_one_perf_thread(struct irqaction *action)
 
 	if (action->flags & IRQF_PERF_AFFINE)
 		mask = cpu_perf_mask;
-
+	else
+		mask = cpu_prime_mask;
 	action->thread->flags |= PF_PERF_CRITICAL;
 	set_cpus_allowed_ptr(action->thread, mask);
 }
@@ -1222,6 +1225,9 @@ static void affine_one_perf_irq(struct irq_desc *desc, unsigned int perf_flag)
 	if (perf_flag & IRQF_PERF_AFFINE) {
 		mask = cpu_perf_mask;
 		mask_index = &perf_cpu_index;
+	} else {
+		mask = cpu_prime_mask;
+		mask_index = &prime_cpu_index;
 	}
 
 	if (!cpumask_intersects(mask, cpu_online_mask)) {
@@ -1230,7 +1236,7 @@ static void affine_one_perf_irq(struct irq_desc *desc, unsigned int perf_flag)
 		return;
 	}
 
-	/* Balance the performance-critical IRQs across the given CPUs */
+	/* Balance the performance-critical IRQs across the given CPUs 
 	while (1) {
 		cpu = cpumask_next_and(*mask_index, mask, cpu_online_mask);
 		if (cpu < nr_cpu_ids)
@@ -1286,17 +1292,17 @@ void unaffine_perf_irqs(void)
 	}
 	raw_spin_unlock_irqrestore(&perf_irqs_lock, flags);
 }
-
 void reaffine_perf_irqs(bool from_hotplug)
 {
 	struct irq_desc_list *data;
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&perf_irqs_lock, flags);
-	/* Don't allow hotplug to reaffine IRQs when resuming from suspend */
+	/* Don't allow hotplug to reaffine IRQs when resuming from suspend 
 	if (!from_hotplug || !perf_crit_suspended) {
 		perf_crit_suspended = false;
 		perf_cpu_index = -1;
+		prime_cpu_index = -1;
 		list_for_each_entry(data, &perf_crit_irqs, list) {
 			struct irq_desc *desc = data->desc;
 
@@ -1308,7 +1314,7 @@ void reaffine_perf_irqs(bool from_hotplug)
 	}
 	raw_spin_unlock_irqrestore(&perf_irqs_lock, flags);
 }
-
+*/
 /*
  * Internal function to register an irqaction - typically used to
  * allocate special interrupts that are part of the architecture.
@@ -1566,11 +1572,12 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 			irqd_set(&desc->irq_data, IRQD_NO_BALANCING);
 		}
 
-		if (new->flags & (IRQF_PERF_AFFINE)) {
-			affine_one_perf_thread(new);
-			irqd_set(&desc->irq_data, IRQD_PERF_CRITICAL);
-			*old_ptr = new;
-		}
+		//if (new->flags & (IRQF_PERF_AFFINE)) {
+	//	if (new->flags & (IRQF_PERF_AFFINE | IRQF_PRIME_AFFINE)) {
+		//	affine_one_perf_thread(new);
+		//	irqd_set(&desc->irq_data, IRQD_PERF_CRITICAL);
+		//	*old_ptr = new;
+		//}
 
 		if (irq_settings_can_autoenable(desc)) {
 			irq_startup(desc, IRQ_RESEND, IRQ_START_COND);
@@ -1596,8 +1603,9 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 				irq, omsk, nmsk);
 	}
 
-	if (!irqd_has_set(&desc->irq_data, IRQD_PERF_CRITICAL))
-		*old_ptr = new;
+	//if (!irqd_has_set(&desc->irq_data, IRQD_PERF_CRITICAL))
+	//	*old_ptr = new;
+	*old_ptr = new;
 
 	irq_pm_install_action(desc, new);
 
@@ -1741,7 +1749,7 @@ static struct irqaction *__free_irq(unsigned int irq, void *dev_id)
 			break;
 		action_ptr = &action->next;
 	}
-
+/*
 	if (irqd_has_set(&desc->irq_data, IRQD_PERF_CRITICAL)) {
 		struct irq_desc_list *data;
 
@@ -1755,7 +1763,7 @@ static struct irqaction *__free_irq(unsigned int irq, void *dev_id)
 		}
 		raw_spin_unlock(&perf_irqs_lock);
 	}
-
+*/
 	/* Found it - now remove it from the list of entries: */
 	*action_ptr = action->next;
 
